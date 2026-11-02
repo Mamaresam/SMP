@@ -19,6 +19,31 @@ const marketData = [
   { asset: 'MATIC', price: '$0.97', change: '+1.42%', volume: '$214.8M', sentiment: 'neutral' },
 ];
 
+const forexPairs = [
+  { pair: 'EUR/USD', price: '1.0847', change: '+0.18%', tone: 'positive', spread: '0.0002', session: 'London / New York' },
+  { pair: 'GBP/USD', price: '1.2674', change: '+0.31%', tone: 'positive', spread: '0.0003', session: 'London / NY' },
+  { pair: 'USD/JPY', price: '154.82', change: '-0.22%', tone: 'negative', spread: '0.04', session: 'Tokyo / London' },
+  { pair: 'AUD/USD', price: '0.6628', change: '+0.26%', tone: 'positive', spread: '0.0002', session: 'Sydney / Tokyo' },
+  { pair: 'USD/CHF', price: '0.9041', change: '-0.12%', tone: 'negative', spread: '0.0003', session: 'Europe / Zurich' },
+  { pair: 'NZD/USD', price: '0.6132', change: '+0.09%', tone: 'positive', spread: '0.0004', session: 'Sydney / Tokyo' },
+];
+
+const tradingSessions = [
+  { name: 'Sydney', open: '22:00', close: '07:00', status: 'Open', timezone: 'UTC+10', overlap: 'Tokyo', color: 'blue' },
+  { name: 'Tokyo', open: '00:00', close: '09:00', status: 'Open', timezone: 'UTC+9', overlap: 'London', color: 'purple' },
+  { name: 'London', open: '08:00', close: '17:00', status: 'Open', timezone: 'UTC+1', overlap: 'New York', color: 'green' },
+  { name: 'New York', open: '13:00', close: '22:00', status: 'Open', timezone: 'UTC-5', overlap: 'London', color: 'amber' },
+];
+
+const blockchainAssets = [
+  { symbol: 'BTC', name: 'Bitcoin', price: '$67,824.19', change: '+2.15%', marketCap: '$1.33T', volume: '$32.7B', network: 'PoW', tone: 'positive' },
+  { symbol: 'ETH', name: 'Ethereum', price: '$3,420.27', change: '+4.82%', marketCap: '$410.8B', volume: '$18.4B', network: 'PoS', tone: 'positive' },
+  { symbol: 'SOL', name: 'Solana', price: '$158.22', change: '+7.63%', marketCap: '$72.1B', volume: '$4.8B', network: 'PoS', tone: 'positive' },
+  { symbol: 'BNB', name: 'BNB Chain', price: '$593.48', change: '+1.48%', marketCap: '$86.3B', volume: '$1.9B', network: 'PoSA', tone: 'positive' },
+  { symbol: 'AVAX', name: 'Avalanche', price: '$35.81', change: '-1.14%', marketCap: '$14.2B', volume: '$621.4M', network: 'PoS', tone: 'negative' },
+  { symbol: 'MATIC', name: 'Polygon', price: '$0.97', change: '+1.42%', marketCap: '$9.3B', volume: '$214.8M', network: 'PoS', tone: 'positive' },
+];
+
 const transactions = [
   { hash: '0x5d2c...f14a', time: '2 min ago', amount: '2.88 ETH', status: 'Success' },
   { hash: '0x17a1...0a44', time: '7 min ago', amount: '410 USDT', status: 'Success' },
@@ -42,8 +67,9 @@ export default function Home() {
 
         <nav className="nav">
           <a href="#markets">Markets</a>
+          <a href="#forex">Forex</a>
           <a href="#analytics">Analytics</a>
-          <a href="#network">Network</a>
+          <a href="#sessions">Sessions</a>
           <a href="#insights">Insights</a>
         </nav>
 
@@ -55,8 +81,8 @@ export default function Home() {
           <span className="eyebrow">Built for on-chain clarity</span>
           <h1>Professional blockchain data, made simple.</h1>
           <p>
-            Monitor wallet movement, transaction depth, token flows, gas pressure, and market
-            sentiment in one streamlined dashboard built for speed and confidence.
+            Monitor wallet movement, transaction depth, token flows, gas pressure, FX pricing, and
+            global trading session windows in one streamlined dashboard built for speed and confidence.
           </p>
 
           <div className="hero-actions">
@@ -177,6 +203,105 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="dashboard-grid">
+        <div className="panel" id="forex">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">FX data</span>
+              <h2>Forex watchlist</h2>
+            </div>
+            <button className="ghost-button">Live quotes</button>
+          </div>
+
+          <div className="fx-table">
+            <div className="fx-header">
+              <span>Pair</span>
+              <span>Price</span>
+              <span>Change</span>
+              <span>Spread</span>
+            </div>
+
+            {forexPairs.map((row) => (
+              <div key={row.pair} className="fx-row">
+                <strong>{row.pair}</strong>
+                <span>{row.price}</span>
+                <span className={`fx-change ${row.tone}`}>{row.change}</span>
+                <span>{row.spread}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel" id="sessions">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">Session clocks</span>
+              <h2>Trading sessions</h2>
+            </div>
+          </div>
+
+          <div className="session-grid">
+            {tradingSessions.map((session) => (
+              <div key={session.name} className={`session-card ${session.color}`}>
+                <div className="session-topline">
+                  <strong>{session.name}</strong>
+                  <span className="session-status">{session.status}</span>
+                </div>
+                <div className="session-time">
+                  <span>{session.open} UTC</span>
+                  <span>→ {session.close} UTC</span>
+                </div>
+                <small>Timezone: {session.timezone}</small>
+                <small>Overlap: {session.overlap}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="panel full-panel">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow small">On-chain overview</span>
+            <h2>Blockchain market data</h2>
+          </div>
+        </div>
+
+        <div className="coin-grid">
+          {blockchainAssets.map((coin) => (
+            <div key={coin.symbol} className="coin-card">
+              <div className="coin-top">
+                <div className="coin-name-wrap">
+                  <span className="coin-badge">{coin.symbol.slice(0, 2)}</span>
+                  <div>
+                    <strong>{coin.symbol}</strong>
+                    <small>{coin.name}</small>
+                  </div>
+                </div>
+                <span className={`coin-change ${coin.tone}`}>{coin.change}</span>
+              </div>
+
+              <div className="coin-price">{coin.price}</div>
+
+              <div className="coin-meta">
+                <span>
+                  <label>Market cap</label>
+                  <strong>{coin.marketCap}</strong>
+                </span>
+                <span>
+                  <label>Volume</label>
+                  <strong>{coin.volume}</strong>
+                </span>
+                <span>
+                  <label>Network</label>
+                  <strong>{coin.network}</strong>
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="bottom-grid" id="insights">
         <div className="panel transactions-panel">
           <div className="section-head">
@@ -216,20 +341,20 @@ export default function Home() {
           <ul className="feature-list">
             <li>
               <strong>Unified monitoring</strong>
-              <span>Track multi-chain metrics from a single control surface.</span>
+              <span>Track multi-chain metrics, FX pricing, and session flow from a single control surface.</span>
             </li>
             <li>
               <strong>Real-time visibility</strong>
-              <span>Analyze wallet behavior, gas pressure, and volatility instantly.</span>
+              <span>Analyze wallet behavior, gas pressure, and market volatility instantly.</span>
             </li>
             <li>
               <strong>Professional navigation</strong>
-              <span>Designed to feel like a high-trust market intelligence product.</span>
+              <span>Designed to feel like a high-trust market intelligence platform.</span>
             </li>
           </ul>
 
           <div className="cta-box">
-            <p>Ready to launch your blockchain intelligence experience.</p>
+            <p>Ready to launch your blockchain intelligence and FX monitoring experience.</p>
             <button className="primary-button">Deploy on Netlify</button>
           </div>
         </div>
