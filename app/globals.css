@@ -1,853 +1,240 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-:root {
-  --bg: #07111f;
-  --bg-2: #0c1424;
-  --panel: rgba(13, 21, 35, 0.86);
-  --panel-strong: rgba(9, 16, 28, 0.94);
-  --panel-alt: rgba(17, 27, 41, 0.85);
-  --line: rgba(148, 163, 184, 0.14);
-  --line-strong: rgba(148, 163, 184, 0.25);
-  --text: #edf5ff;
-  --muted: #9aaccc;
-  --primary: #6fe7c8;
-  --primary-2: #7aa9ff;
-  --blue: #78a9ff;
-  --purple: #9d7cf2;
-  --amber: #f5c76d;
-  --green: #61e6a7;
-  --red: #ff7d7d;
-  --shadow: 0 30px 80px rgba(5, 10, 18, 0.68);
-  --glow: rgba(111, 231, 200, 0.24);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: 'Inter', sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(90, 168, 255, 0.2), transparent 28%),
-    radial-gradient(circle at top right, rgba(111, 231, 200, 0.16), transparent 28%),
-    linear-gradient(180deg, #050b15 0%, #07111f 36%, #091827 100%);
-  color: var(--text);
-}
-
-button,
-input,
-select {
-  font: inherit;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-img {
-  max-width: 100%;
-  display: block;
-}
-
-.page-shell {
-  width: min(1280px, calc(100% - 36px));
-  margin: 26px auto 48px;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 20px;
-  border-radius: 20px;
-  background: rgba(8, 14, 24, 0.8);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  box-shadow: var(--shadow);
-  position: sticky;
-  top: 18px;
-  z-index: 20;
-}
-
-.brand-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand-mark {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  color: #081621;
-  font-weight: 800;
-  font-size: 1.3rem;
-}
-
-.brand-name {
-  display: block;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.brand-group small {
-  display: block;
-  color: var(--muted);
-  margin-top: 2px;
-  font-size: 11px;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  color: var(--muted);
-  font-size: 0.94rem;
-}
-
-.nav a {
-  transition: color 0.2s ease;
-}
-
-.nav a:hover {
-  color: var(--text);
-}
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.status-dot {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #2de4a6;
-  box-shadow: 0 0 18px rgba(45, 228, 166, 0.9);
-}
-
-.primary-button,
-.secondary-button,
-.ghost-button {
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.primary-button:hover,
-.secondary-button:hover,
-.ghost-button:hover {
-  transform: translateY(-1px);
-}
-
-.primary-button {
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  color: #060d18;
-  font-weight: 700;
-  padding: 11px 18px;
-  box-shadow: 0 12px 24px rgba(111, 231, 200, 0.18);
-}
-
-.secondary-button,
-.ghost-button {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--line);
-  color: var(--text);
-  padding: 11px 18px;
-}
-
-.hero {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  align-items: center;
-  gap: 28px;
-  padding: 44px 0 18px;
-}
-
-.hero-copy h1 {
-  margin: 12px 0 16px;
-  font-size: clamp(2.8rem, 5vw, 5rem);
-  line-height: 0.98;
-  letter-spacing: -0.07em;
-}
-
-.hero-copy p {
-  max-width: 640px;
-  color: var(--muted);
-  font-size: 1.08rem;
-  line-height: 1.7;
-  margin-bottom: 26px;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(111, 231, 200, 0.08);
-  border: 1px solid rgba(111, 231, 200, 0.22);
-  color: var(--primary);
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.eyebrow.small {
-  font-size: 0.66rem;
-  padding: 7px 10px;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 28px;
-}
-
-.trust-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 28px;
-}
-
-.trust-row div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.trust-row strong {
-  font-size: 1.35rem;
-}
-
-.trust-row span {
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.hero-panel,
-.panel,
-.stat-card {
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(13, 22, 36, 0.92), rgba(9, 16, 28, 0.94));
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-}
-
-.hero-panel {
-  padding: 20px;
-}
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.chip.live {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 74px;
-  background: rgba(97, 230, 167, 0.12);
-  color: var(--green);
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  margin-bottom: 9px;
-}
-
-.panel-header h3,
-.section-head h2 {
-  margin: 0;
-  font-size: clamp(1.2rem, 2vw, 1.6rem);
-}
-
-.status-pill,
-.chip-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 72px;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.status-pill {
-  color: var(--blue);
-  background: rgba(120, 169, 255, 0.12);
-  border: 1px solid rgba(120, 169, 255, 0.3);
-}
-
-.chip-pill.positive {
-  color: var(--green);
-  background: rgba(97, 230, 167, 0.12);
-}
-
-.chip-pill.negative {
-  color: var(--red);
-  background: rgba(255, 125, 125, 0.12);
-}
-
-.chart-wrap {
-  height: 200px;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  align-items: end;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 16px 10px 6px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(108, 117, 255, 0.12), rgba(14, 23, 36, 0.8));
-  border: 1px solid rgba(124, 143, 196, 0.18);
-}
-
-.chart-wrap span {
-  display: block;
-  border-radius: 12px 12px 0 0;
-  background: linear-gradient(180deg, rgba(111, 231, 200, 0.9), rgba(120, 169, 255, 0.76));
-  box-shadow: 0 0 18px rgba(111, 231, 200, 0.22);
-}
-
-.panel-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  padding-top: 18px;
-}
-
-.panel-metrics div {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.panel-metrics label {
-  color: var(--muted);
-  font-size: 0.78rem;
-}
-
-.panel-metrics strong {
-  font-size: 1.08rem;
-}
-
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 12px;
-}
-
-.stat-card {
-  padding: 18px 18px 20px;
-}
-
-.stat-card small {
-  color: var(--muted);
-  display: block;
-}
-
-.stat-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 14px;
-  margin-top: 14px;
-}
-
-.stat-row strong {
-  font-size: clamp(1.45rem, 3vw, 2rem);
-}
-
-.trend {
-  display: inline-flex;
-  padding: 6px 8px;
-  border-radius: 999px;
-  font-size: 0.74rem;
-  font-weight: 700;
-}
-
-.trend.green {
-  color: var(--green);
-  background: rgba(97, 230, 167, 0.12);
-}
-
-.trend.blue {
-  color: var(--blue);
-  background: rgba(120, 169, 255, 0.12);
-}
-
-.trend.purple {
-  color: #cab5ff;
-  background: rgba(157, 124, 242, 0.12);
-}
-
-.trend.amber {
-  color: var(--amber);
-  background: rgba(245, 199, 109, 0.12);
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 20px;
-  margin-top: 22px;
-}
-
-.panel {
-  padding: 20px;
-}
-
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.subtle-text {
-  color: var(--muted);
-  font-size: 0.8rem;
+const stats = [
+  { label: 'Network Activity', value: '$8.9B', change: '+12.4%', tone: 'green' },
+  { label: 'Transactions / 24h', value: '4.2M', change: '+8.1%', tone: 'blue' },
+  { label: 'Active Wallets', value: '1.8M', change: '+5.7%', tone: 'purple' },
+  { label: 'Avg. Gas', value: '22 Gwei', change: '-3.4%', tone: 'amber' },
+];
+
+const marketPairs = [
+  { symbol: 'BTC/USD', price: '$67,824.19', delta: '+2.15%', direction: 'up', volume: '$2.31T' },
+  { symbol: 'ETH/USD', price: '$3,420.27', delta: '+4.82%', direction: 'up', volume: '$1.64T' },
+  { symbol: 'SOL/USD', price: '$158.22', delta: '+7.63%', direction: 'up', volume: '$940.1B' },
+  { symbol: 'XAU/USD', price: '$2,370.14', delta: '+0.84%', direction: 'up', volume: '$18.4B' },
+];
+
+const networks = [
+  { name: 'Ethereum', value: '68%', color: '#78e7d3' },
+  { name: 'Polygon', value: '18%', color: '#7aa2ff' },
+  { name: 'BNB Chain', value: '9%', color: '#f5c76d' },
+  { name: 'Base', value: '5%', color: '#9f7aea' },
+];
+
+const transactions = [
+  { hash: '0x5d2c...f14a', time: '2 min ago', amount: '2.88 ETH', status: 'Success' },
+  { hash: '0x17a1...0a44', time: '7 min ago', amount: '410 USDT', status: 'Success' },
+  { hash: '0x3d8e...992c', time: '14 min ago', amount: '0.64 BTC', status: 'Pending' },
+  { hash: '0xc91f...91aa', time: '26 min ago', amount: '12.4 SOL', status: 'Failed' },
+];
+
+const marketSignals = [
+  { title: 'Unified monitoring', text: 'Track multi-chain metrics from a single control surface.' },
+  { title: 'Real-time visibility', text: 'Analyze wallet behavior, gas pressure, and volatility instantly.' },
+  { title: 'Professional navigation', text: 'Built to feel like a high-trust market intelligence product.' },
+];
+
+const chartBars = [42, 62, 36, 78, 56, 90, 68, 84, 60, 96, 72, 88];
+
+export default function Home() {
+  return (
+    <main className="page-shell">
+      <header className="topbar">
+        <div className="brand-group">
+          <div className="brand-mark">S</div>
+          <div>
+            <span className="brand-name">SMP</span>
+            <small>Blockchain Intelligence</small>
+          </div>
+        </div>
+
+        <nav className="nav">
+          <a href="#markets">Markets</a>
+          <a href="#analytics">Analytics</a>
+          <a href="#network">Network</a>
+          <a href="#insights">Insights</a>
+        </nav>
+
+        <button className="primary-button">Launch Dashboard</button>
+      </header>
+
+      <section className="hero">
+        <div className="hero-copy">
+          <span className="eyebrow">Built for on-chain clarity</span>
+          <h1>Professional blockchain data, made simple.</h1>
+          <p>
+            Monitor wallet movement, transaction depth, token flows, gas pressure, and market
+            sentiment in one streamlined dashboard built for speed and confidence.
+          </p>
+
+          <div className="hero-actions">
+            <button className="primary-button">Explore Analytics</button>
+            <button className="secondary-button">View Demo</button>
+          </div>
+
+          <div className="trust-row">
+            <div>
+              <strong>200+</strong>
+              <span>Protocol metrics</span>
+            </div>
+            <div>
+              <strong>24/7</strong>
+              <span>Market monitoring</span>
+            </div>
+            <div>
+              <strong>99.9%</strong>
+              <span>Uptime reliability</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-panel">
+          <div className="panel-header">
+            <div>
+              <span className="chip live">Live</span>
+              <h3>Network Overview</h3>
+            </div>
+            <span className="status-pill">+3.42% today</span>
+          </div>
+
+          <div className="chart-wrap">
+            {[...chartBars].reverse().map((height, index) => (
+              <span key={index} style={{ height: `${height}%` }} />
+            ))}
+          </div>
+
+          <div className="panel-metrics">
+            <div>
+              <label>TPS</label>
+              <strong>183.2</strong>
+            </div>
+            <div>
+              <label>TVL</label>
+              <strong>$42.8B</strong>
+            </div>
+            <div>
+              <label>Hash Rate</label>
+              <strong>1.09 EH/s</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="stat-grid" id="analytics">
+        {stats.map((stat) => (
+          <div key={stat.label} className="stat-card">
+            <small>{stat.label}</small>
+            <div className="stat-row">
+              <strong>{stat.value}</strong>
+              <span className={`trend ${stat.tone}`}>{stat.change}</span>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="content-grid">
+        <div className="panel" id="markets">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">Market Pulse</span>
+              <h2>Top movers</h2>
+            </div>
+            <button className="ghost-button">See all</button>
+          </div>
+
+          <div className="market-list">
+            {marketPairs.map((item) => (
+              <div key={item.symbol} className="market-row">
+                <div className="asset">
+                  <span className="asset-badge">{item.symbol.slice(0, 2)}</span>
+                  <div>
+                    <strong>{item.symbol}</strong>
+                    <small>{item.price}</small>
+                  </div>
+                </div>
+
+                <span className={`tag ${item.direction}`}>{item.delta}</span>
+                <strong className="volume">{item.volume}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel" id="network">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">Network share</span>
+              <h2>Chain mix</h2>
+            </div>
+          </div>
+
+          <div className="network-visual">
+            {networks.map((network) => (
+              <div key={network.name} className="network-row">
+                <div className="label-wrap">
+                  <span className="dot" style={{ background: network.color }} />
+                  <span>{network.name}</span>
+                </div>
+                <div className="progress-track">
+                  <span style={{ width: network.value, background: network.color }} />
+                </div>
+                <strong>{network.value}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bottom-grid" id="insights">
+        <div className="panel transactions-panel">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">Live flow</span>
+              <h2>Recent transactions</h2>
+            </div>
+          </div>
+
+          <div className="tx-table">
+            <div className="tx-header">
+              <span>Hash</span>
+              <span>Time</span>
+              <span>Amount</span>
+              <span>Status</span>
+            </div>
+
+            {transactions.map((tx) => (
+              <div key={tx.hash} className="tx-row">
+                <span>{tx.hash}</span>
+                <span>{tx.time}</span>
+                <span>{tx.amount}</span>
+                <span className={`status ${tx.status.toLowerCase()}`}>{tx.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel insight-panel">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">Operational insight</span>
+              <h2>Why SMP works</h2>
+            </div>
+          </div>
+
+          <ul className="feature-list">
+            {marketSignals.map((signal) => (
+              <li key={signal.title}>
+                <strong>{signal.title}</strong>
+                <span>{signal.text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="cta-box">
+            <p>Ready to launch your blockchain intelligence experience.</p>
+            <button className="primary-button">Deploy on Netlify</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }
 
-.crypto-list,
-.fx-table,
-.session-grid,
-.gas-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.crypto-row,
-.fx-row {
-  display: grid;
-  grid-template-columns: 1.2fr 0.85fr 0.7fr;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 16px;
-}
-
-.coin-main {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.coin-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-weight: 700;
-  overflow: hidden;
-  box-shadow: 0 12px 20px rgba(111, 231, 200, 0.18);
-}
-
-.coin-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.coin-main strong,
-.coin-mid strong,
-.coin-right strong,
-.fx-row strong {
-  display: block;
-}
-
-.coin-main small,
-.coin-mid small,
-.coin-right small,
-.fx-row span {
-  color: var(--muted);
-}
-
-.coin-mid {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.coin-right {
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.fx-row {
-  grid-template-columns: 1.1fr 0.8fr 0.8fr 0.5fr;
-}
-
-.fx-pair {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.fx-flag {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(120, 169, 255, 0.12);
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.fx-change.positive,
-.coin-change.positive {
-  color: var(--green);
-}
-
-.fx-change.negative,
-.coin-change.negative {
-  color: var(--red);
-}
-
-.insight-panel {
-  margin-top: 22px;
-}
-
-.analysis-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.mini-panel {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 18px;
-  padding: 14px 14px 6px;
-}
-
-.mini-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.mini-head strong {
-  display: block;
-  font-size: 1.3rem;
-}
-
-.mini-head small {
-  display: block;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-.sparkline {
-  width: 100%;
-  height: 120px;
-  display: block;
-  margin-top: 8px;
-}
-
-.line {
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.line-primary { stroke: #6fe7c8; }
-.line-gold { stroke: #f5c76d; }
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr 1fr;
-  gap: 20px;
-  margin-top: 22px;
-}
-
-.gas-list {
-  margin-bottom: 18px;
-}
-
-.gas-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.gas-box span {
-  color: var(--muted);
-}
-
-.gas-box strong {
-  font-size: 1.2rem;
-}
-
-.gas-box.slow {
-  border-color: rgba(255, 125, 125, 0.14);
-}
-
-.gas-box.standard {
-  border-color: rgba(120, 169, 255, 0.14);
-}
-
-.gas-box.fast {
-  border-color: rgba(111, 231, 200, 0.14);
-}
-
-.base-fee {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 6px;
-  color: var(--muted);
-  border-top: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.base-fee strong {
-  color: var(--text);
-  font-size: 1.15rem;
-}
-
-.session-grid {
-  gap: 12px;
-}
-
-.session-card {
-  border-radius: 16px;
-  padding: 14px 14px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.session-card.blue { border-color: rgba(120, 169, 255, 0.2); }
-.session-card.purple { border-color: rgba(157, 124, 242, 0.2); }
-.session-card.green { border-color: rgba(97, 230, 167, 0.2); }
-.session-card.amber { border-color: rgba(245, 199, 109, 0.2); }
-
-.session-topline,
-.session-time {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.session-status {
-  display: inline-flex;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--green);
-  background: rgba(97, 230, 167, 0.12);
-}
-
-.session-time {
-  margin: 12px 0 8px;
-  color: var(--muted);
-  font-size: 0.82rem;
-}
-
-.session-card small {
-  display: block;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.full-panel {
-  margin-top: 22px;
-}
-
-.bottom-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 20px;
-  margin-top: 22px;
-}
-
-.tx-table {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tx-header,
-.tx-row {
-  display: grid;
-  grid-template-columns: 1.2fr 0.7fr 0.7fr 0.5fr;
-  gap: 12px;
-  align-items: center;
-  padding: 12px 10px;
-}
-
-.tx-header {
-  color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.tx-row {
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.status {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  padding: 7px 8px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.status.success {
-  color: var(--green);
-  background: rgba(97, 230, 167, 0.12);
-}
-
-.status.pending {
-  color: var(--amber);
-  background: rgba(245, 199, 109, 0.12);
-}
-
-.status.failed {
-  color: var(--red);
-  background: rgba(255, 125, 125, 0.12);
-}
-
-.feature-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.feature-list li {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 14px;
-}
-
-.feature-list strong {
-  font-size: 1rem;
-}
-
-.feature-list span {
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.cta-box {
-  margin-top: 18px;
-  border-radius: 18px;
-  padding: 18px;
-  background: linear-gradient(135deg, rgba(111, 231, 200, 0.12), rgba(120, 169, 255, 0.12));
-  border: 1px solid rgba(111, 231, 200, 0.18);
-}
-
-.cta-box p {
-  margin: 0 0 14px;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-@media (max-width: 1100px) {
-  .dashboard-grid,
-  .bottom-grid,
-  .hero,
-  .grid-3 {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .page-shell {
-    width: min(100% - 18px, 1280px);
-  }
-
-  .topbar {
-    flex-wrap: wrap;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .topbar-right {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .hero-actions,
-  .trust-row,
-  .analysis-grid {
-    grid-template-columns: 1fr;
-    flex-direction: column;
-  }
-
-  .stat-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .crypto-row,
-  .fx-row,
-  .tx-header {
-    display: none;
-  }
-
-  .tx-row {
-    grid-template-columns: 1fr 1fr;
-  }
-}
