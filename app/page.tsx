@@ -27,6 +27,14 @@ const fxPairs = [
   { pair: 'USD/CAD', base: 'CAD' },
 ];
 
+// Illustrative rows only; the UI labels these as demo data, not live transactions.
+const transactions = [
+  { hash: '0x5d2c...f14a', time: '2 min ago', amount: '2.88 ETH', status: 'Success' },
+  { hash: '0x17a1...0a44', time: '7 min ago', amount: '410 USDT', status: 'Success' },
+  { hash: '0x3d8e...992c', time: '14 min ago', amount: '0.64 BTC', status: 'Pending' },
+  { hash: '0xc91f...91aa', time: '26 min ago', amount: '12.4 SOL', status: 'Failed' },
+];
+
 function money(value: number, digits = 2) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency', currency: 'USD', maximumFractionDigits: digits,
@@ -98,7 +106,7 @@ export default function Home() {
       const rates = fxResult.value.rates;
       setFx(fxPairs.map(({ pair, base }) => ({
         pair,
-        price: pair.startsWith('USD/') ? (1 / (rates[base] ?? 1)) : (1 / (rates[base] ?? 1)),
+        price: 1 / (rates[base] ?? 1),
       })));
     } else failures.push('forex');
 
