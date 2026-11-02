@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type ForexRow = {
   pair: string;
@@ -9,6 +9,7 @@ type ForexRow = {
   tone: 'positive' | 'negative';
   spread: string;
   session: string;
+  flag: string;
 };
 
 type CryptoRow = {
@@ -20,31 +21,58 @@ type CryptoRow = {
   volume: string;
   network: string;
   tone: 'positive' | 'negative';
+  icon: string;
+};
+
+type GasData = {
+  slow: string;
+  standard: string;
+  fast: string;
+  baseFee: string;
+};
+
+type GoldData = {
+  price: string;
+  change: string;
+  tone: 'positive' | 'negative';
+};
+
+const DEFAULT_GAS: GasData = {
+  slow: '18 gwei',
+  standard: '26 gwei',
+  fast: '42 gwei',
+  baseFee: '24 gwei',
+};
+
+const DEFAULT_GOLD: GoldData = {
+  price: '$2,347.10',
+  change: '+0.84%',
+  tone: 'positive',
 };
 
 const DEFAULT_FOREX: ForexRow[] = [
-  { pair: 'EUR/USD', price: '1.0847', change: '+0.18%', tone: 'positive', spread: '0.0002', session: 'London / New York' },
-  { pair: 'GBP/USD', price: '1.2674', change: '+0.31%', tone: 'positive', spread: '0.0003', session: 'London / NY' },
-  { pair: 'USD/JPY', price: '154.82', change: '-0.22%', tone: 'negative', spread: '0.04', session: 'Tokyo / London' },
-  { pair: 'AUD/USD', price: '0.6628', change: '+0.26%', tone: 'positive', spread: '0.0002', session: 'Sydney / Tokyo' },
-  { pair: 'USD/CHF', price: '0.9041', change: '-0.12%', tone: 'negative', spread: '0.0003', session: 'Europe / Zurich' },
-  { pair: 'NZD/USD', price: '0.6132', change: '+0.09%', tone: 'positive', spread: '0.0004', session: 'Sydney / Tokyo' },
+  { pair: 'EUR/USD', price: '1.0847', change: '+0.18%', tone: 'positive', spread: '0.0002', session: 'London / New York', flag: '€' },
+  { pair: 'GBP/USD', price: '1.2674', change: '+0.31%', tone: 'positive', spread: '0.0003', session: 'London / NY', flag: '£' },
+  { pair: 'USD/JPY', price: '154.82', change: '-0.22%', tone: 'negative', spread: '0.04', session: 'Tokyo / London', flag: '¥' },
+  { pair: 'AUD/USD', price: '0.6628', change: '+0.26%', tone: 'positive', spread: '0.0002', session: 'Sydney / Tokyo', flag: 'A' },
+  { pair: 'USD/CHF', price: '0.9041', change: '-0.12%', tone: 'negative', spread: '0.0003', session: 'Europe / Zurich', flag: 'S' },
+  { pair: 'NZD/USD', price: '0.6132', change: '+0.09%', tone: 'positive', spread: '0.0004', session: 'Sydney / Tokyo', flag: 'N' },
 ];
 
 const DEFAULT_CRYPTO: CryptoRow[] = [
-  { symbol: 'BTC', name: 'Bitcoin', price: '$67,824.19', change: '+2.15%', marketCap: '$1.33T', volume: '$32.7B', network: 'PoW', tone: 'positive' },
-  { symbol: 'ETH', name: 'Ethereum', price: '$3,420.27', change: '+4.82%', marketCap: '$410.8B', volume: '$18.4B', network: 'PoS', tone: 'positive' },
-  { symbol: 'SOL', name: 'Solana', price: '$158.22', change: '+7.63%', marketCap: '$72.1B', volume: '$4.8B', network: 'PoS', tone: 'positive' },
-  { symbol: 'BNB', name: 'BNB Chain', price: '$593.48', change: '+1.48%', marketCap: '$86.3B', volume: '$1.9B', network: 'PoSA', tone: 'positive' },
-  { symbol: 'AVAX', name: 'Avalanche', price: '$35.81', change: '-1.14%', marketCap: '$14.2B', volume: '$621.4M', network: 'PoS', tone: 'negative' },
-  { symbol: 'MATIC', name: 'Polygon', price: '$0.97', change: '+1.42%', marketCap: '$9.3B', volume: '$214.8M', network: 'PoS', tone: 'positive' },
+  { symbol: 'BTC', name: 'Bitcoin', price: '$67,824.19', change: '+2.15%', marketCap: '$1.33T', volume: '$32.7B', network: 'PoW', tone: 'positive', icon: '₿' },
+  { symbol: 'ETH', name: 'Ethereum', price: '$3,420.27', change: '+4.82%', marketCap: '$410.8B', volume: '$18.4B', network: 'PoS', tone: 'positive', icon: 'Ξ' },
+  { symbol: 'SOL', name: 'Solana', price: '$158.22', change: '+7.63%', marketCap: '$72.1B', volume: '$4.8B', network: 'PoS', tone: 'positive', icon: 'S' },
+  { symbol: 'BNB', name: 'BNB Chain', price: '$593.48', change: '+1.48%', marketCap: '$86.3B', volume: '$1.9B', network: 'PoSA', tone: 'positive', icon: 'B' },
+  { symbol: 'AVAX', name: 'Avalanche', price: '$35.81', change: '-1.14%', marketCap: '$14.2B', volume: '$621.4M', network: 'PoS', tone: 'negative', icon: 'A' },
+  { symbol: 'MATIC', name: 'Polygon', price: '$0.97', change: '+1.42%', marketCap: '$9.3B', volume: '$214.8M', network: 'PoS', tone: 'positive', icon: 'M' },
 ];
 
 const stats = [
   { label: 'Network Activity', value: '$8.9B', change: '+12.4%', tone: 'green' },
   { label: 'Transactions / 24h', value: '4.2M', change: '+8.1%', tone: 'blue' },
   { label: 'Active Wallets', value: '1.8M', change: '+5.7%', tone: 'purple' },
-  { label: 'Avg. Gas', value: '22 Gwei', change: '-3.4%', tone: 'amber' },
+  { label: 'Avg. Gas', value: '26 Gwei', change: '-3.4%', tone: 'amber' },
 ];
 
 const networks = [
@@ -52,13 +80,6 @@ const networks = [
   { name: 'Polygon', value: '18%', color: '#7aa2ff' },
   { name: 'BNB Chain', value: '9%', color: '#f5c76d' },
   { name: 'Base', value: '5%', color: '#9f7aea' },
-];
-
-const marketData = [
-  { asset: 'ETH', price: '$3,420.27', change: '+4.82%', volume: '$1.64T', sentiment: 'bullish' },
-  { asset: 'BTC', price: '$67,824.19', change: '+2.15%', volume: '$2.31T', sentiment: 'bullish' },
-  { asset: 'SOL', price: '$158.22', change: '+7.63%', volume: '$940.1B', sentiment: 'bullish' },
-  { asset: 'MATIC', price: '$0.97', change: '+1.42%', volume: '$214.8M', sentiment: 'neutral' },
 ];
 
 const tradingSessions = [
@@ -75,7 +96,12 @@ const transactions = [
   { hash: '0xc91f...91aa', time: '26 min ago', amount: '12.4 SOL', status: 'Failed' },
 ];
 
-const chartBars = [52, 72, 36, 88, 55, 96, 70, 82, 63, 94, 58, 78];
+const marketData = [
+  { asset: 'ETH', price: '$3,420.27', change: '+4.82%', volume: '$1.64T', sentiment: 'bullish' },
+  { asset: 'BTC', price: '$67,824.19', change: '+2.15%', volume: '$2.31T', sentiment: 'bullish' },
+  { asset: 'SOL', price: '$158.22', change: '+7.63%', volume: '$940.1B', sentiment: 'bullish' },
+  { asset: 'MATIC', price: '$0.97', change: '+1.42%', volume: '$214.8M', sentiment: 'neutral' },
+];
 
 function formatMoney(value: number): string {
   if (value >= 1_000_000_000_000) return `$${(value / 1_000_000_000_000).toFixed(2)}T`;
@@ -83,6 +109,22 @@ function formatMoney(value: number): string {
   if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
   if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
   return `$${value.toFixed(2)}`;
+}
+
+function buildLinePath(values: number[]) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const width = 420;
+  const height = 130;
+  const range = max - min || 1;
+
+  return values
+    .map((value, index) => {
+      const x = (index / (values.length - 1)) * width;
+      const y = height - ((value - min) / range) * (height - 18) - 10;
+      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+    })
+    .join(' ');
 }
 
 async function fetchForexData(): Promise<ForexRow[]> {
@@ -98,15 +140,15 @@ async function fetchForexData(): Promise<ForexRow[]> {
     const rates = json.rates ?? {};
 
     const pairMap = [
-      { pair: 'EUR/USD', base: 'EUR' },
-      { pair: 'GBP/USD', base: 'GBP' },
-      { pair: 'USD/JPY', base: 'JPY' },
-      { pair: 'AUD/USD', base: 'AUD' },
-      { pair: 'USD/CHF', base: 'CHF' },
-      { pair: 'NZD/USD', base: 'NZD' },
+      { pair: 'EUR/USD', base: 'EUR', flag: '€' },
+      { pair: 'GBP/USD', base: 'GBP', flag: '£' },
+      { pair: 'USD/JPY', base: 'JPY', flag: '¥' },
+      { pair: 'AUD/USD', base: 'AUD', flag: 'A' },
+      { pair: 'USD/CHF', base: 'CHF', flag: 'S' },
+      { pair: 'NZD/USD', base: 'NZD', flag: 'N' },
     ];
 
-    return pairMap.map(({ pair, base }) => {
+    return pairMap.map(({ pair, base, flag }) => {
       const rate = rates[base] ?? 1;
       const numericValue = pair.startsWith('USD/') ? 1 / rate : 1 / rate;
       const positive = pair === 'USD/JPY' ? rate < 154.9 : numericValue > 1;
@@ -123,11 +165,63 @@ async function fetchForexData(): Promise<ForexRow[]> {
             : pair === 'USD/JPY'
               ? 'Tokyo / London'
               : 'Sydney / Tokyo',
+        flag,
       };
     });
   } catch {
     return DEFAULT_FOREX;
   }
+}
+
+async function fetchGasData(): Promise<GasData> {
+  try {
+    const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json', {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) throw new Error('Gas fetch failed');
+
+    const json = await response.json() as {
+      safeLow?: number;
+      average?: number;
+      fast?: number;
+      baseFee?: number;
+    };
+
+    return {
+      slow: `${((json.safeLow ?? 18) / 10).toFixed(0)} gwei`,
+      standard: `${((json.average ?? 26) / 10).toFixed(0)} gwei`,
+      fast: `${((json.fast ?? 42) / 10).toFixed(0)} gwei`,
+      baseFee: `${((json.baseFee ?? 24) / 10).toFixed(0)} gwei`,
+    };
+  } catch {
+    return DEFAULT_GAS;
+  }
+}
+
+async function fetchGoldData(): Promise<GoldData> {
+  try {
+    const response = await fetch('https://api.gold-api.com/price/XAU', {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) throw new Error('Gold fetch failed');
+
+    const json = await response.json() as { price?: number };
+    if (typeof json.price === 'number') {
+      return {
+        price: `$${Number(json.price).toLocaleString('en-US', { maximumFractionDigits: 2 })}`,
+        change: '+0.84%',
+        tone: 'positive',
+      };
+    }
+  } catch {
+    // fallback below
+  }
+
+  return DEFAULT_GOLD;
 }
 
 async function fetchCryptoData(): Promise<CryptoRow[]> {
@@ -150,6 +244,7 @@ async function fetchCryptoData(): Promise<CryptoRow[]> {
       market_cap: number;
       total_volume: number;
       price_change_percentage_24h: number;
+      image: string;
     }>;
 
     const networkMap: Record<string, string> = {
@@ -179,6 +274,7 @@ async function fetchCryptoData(): Promise<CryptoRow[]> {
       volume: formatMoney(Number(coin.total_volume ?? 0)),
       network: networkMap[coin.id] ?? 'PoS',
       tone: Number(coin.price_change_percentage_24h ?? 0) >= 0 ? 'positive' : 'negative',
+      icon: coin.image ? coin.image : coin.symbol.toUpperCase().slice(0, 2),
     }));
   } catch {
     return DEFAULT_CRYPTO;
@@ -188,34 +284,49 @@ async function fetchCryptoData(): Promise<CryptoRow[]> {
 export default function Home() {
   const [forexPairs, setForexPairs] = useState<ForexRow[]>(DEFAULT_FOREX);
   const [blockchainAssets, setBlockchainAssets] = useState<CryptoRow[]>(DEFAULT_CRYPTO);
+  const [gasData, setGasData] = useState<GasData>(DEFAULT_GAS);
+  const [goldData, setGoldData] = useState<GoldData>(DEFAULT_GOLD);
+  const [marketClock, setMarketClock] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    let active = true;
 
-    const loadData = async () => {
+    const run = async () => {
       try {
-        const [fx, crypto] = await Promise.all([fetchForexData(), fetchCryptoData()]);
+        const [fx, crypto, gas, gold] = await Promise.all([
+          fetchForexData(),
+          fetchCryptoData(),
+          fetchGasData(),
+          fetchGoldData(),
+        ]);
 
-        if (isMounted) {
-          setForexPairs(fx);
-          setBlockchainAssets(crypto);
-        }
-      } catch {
-        // leave fallback values in place
+        if (!active) return;
+
+        setForexPairs(fx);
+        setBlockchainAssets(crypto);
+        setGasData(gas);
+        setGoldData(gold);
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (active) setIsLoading(false);
       }
     };
 
-    loadData();
+    run();
+
+    const timer = setInterval(() => setMarketClock(new Date()), 60 * 1000);
 
     return () => {
-      isMounted = false;
+      active = false;
+      clearInterval(timer);
     };
   }, []);
+
+  const btcSeries = useMemo(() => [68, 71, 69, 73, 75, 74, 78, 81, 80, 83, 87, 90], []);
+  const goldSeries = useMemo(() => [2320, 2332, 2346, 2338, 2349, 2361, 2355, 2369, 2378, 2369, 2382, 2347], []);
+
+  const btcPath = buildLinePath(btcSeries);
+  const goldPath = buildLinePath(goldSeries);
 
   return (
     <main className="page-shell">
@@ -236,16 +347,19 @@ export default function Home() {
           <a href="#insights">Insights</a>
         </nav>
 
-        <button className="primary-button">Launch Dashboard</button>
+        <div className="topbar-right">
+          <span className="status-dot" />
+          <span>{marketClock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <button className="primary-button">Launch Dashboard</button>
+        </div>
       </header>
 
       <section className="hero">
         <div className="hero-copy">
-          <span className="eyebrow">Built for on-chain clarity</span>
-          <h1>Professional blockchain data, made simple.</h1>
+          <span className="eyebrow">Live market intelligence</span>
+          <h1>Professional blockchain data, built for real-time decision making.</h1>
           <p>
-            Monitor wallet movement, transaction depth, token flows, gas pressure, FX pricing, and
-            global trading session windows in one streamlined dashboard built for speed and confidence.
+            Monitor market momentum, wallet flow, gas pressure, cross-asset pricing, and trading session activity from a single live dashboard.
           </p>
 
           <div className="hero-actions">
@@ -313,60 +427,43 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="content-grid">
+      <section className="dashboard-grid">
         <div className="panel" id="markets">
           <div className="section-head">
             <div>
-              <span className="eyebrow small">Market Pulse</span>
-              <h2>Top movers</h2>
+              <span className="eyebrow small">Live market</span>
+              <h2>Crypto leaderboard</h2>
             </div>
-            <button className="ghost-button">See all</button>
+            <button className="ghost-button">View all</button>
           </div>
 
-          <div className="market-list">
-            {marketData.map((item) => (
-              <div key={item.asset} className="market-row">
-                <div className="asset">
-                  <span className="asset-badge">{item.asset.slice(0, 2)}</span>
+          <div className="crypto-list">
+            {blockchainAssets.map((coin) => (
+              <div key={coin.symbol} className="crypto-row">
+                <div className="coin-main">
+                  <div className="coin-logo" style={{ background: coin.tone === 'positive' ? 'linear-gradient(135deg, #4ad7a8, #7aa9ff)' : 'linear-gradient(135deg, #ff8a8a, #ffb36b)' }}>
+                    {coin.icon.startsWith('http') ? <img src={coin.icon} alt={coin.symbol} /> : coin.icon}
+                  </div>
                   <div>
-                    <strong>{item.asset}</strong>
-                    <small>{item.price}</small>
+                    <strong>{coin.symbol}</strong>
+                    <small>{coin.name}</small>
                   </div>
                 </div>
 
-                <span className={`tag ${item.sentiment}`}>{item.change}</span>
-                <strong className="volume">{item.volume}</strong>
+                <div className="coin-mid">
+                  <strong>{coin.price}</strong>
+                  <small>{coin.network}</small>
+                </div>
+
+                <div className="coin-right">
+                  <span className={`chip-pill ${coin.tone}`}>{coin.change}</span>
+                  <small>{coin.volume}</small>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="panel" id="network">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow small">Network share</span>
-              <h2>Chain mix</h2>
-            </div>
-          </div>
-
-          <div className="network-visual">
-            {networks.map((network) => (
-              <div key={network.name} className="network-row">
-                <div className="label-wrap">
-                  <span className="dot" style={{ background: network.color }} />
-                  <span>{network.name}</span>
-                </div>
-                <div className="progress-track">
-                  <span style={{ width: network.value, background: network.color }} />
-                </div>
-                <strong>{network.value}</strong>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="dashboard-grid">
         <div className="panel" id="forex">
           <div className="section-head">
             <div>
@@ -377,21 +474,86 @@ export default function Home() {
           </div>
 
           <div className="fx-table">
-            <div className="fx-header">
-              <span>Pair</span>
-              <span>Price</span>
-              <span>Change</span>
-              <span>Spread</span>
-            </div>
-
             {forexPairs.map((row) => (
               <div key={row.pair} className="fx-row">
-                <strong>{row.pair}</strong>
+                <div className="fx-pair">
+                  <span className="fx-flag">{row.flag}</span>
+                  <strong>{row.pair}</strong>
+                </div>
                 <span>{row.price}</span>
                 <span className={`fx-change ${row.tone}`}>{row.change}</span>
                 <span>{row.spread}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="panel insight-panel full-panel">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow small">Live pulse</span>
+            <h2>Pulse overview</h2>
+          </div>
+          <span className="subtle-text">Updated every minute</span>
+        </div>
+
+        <div className="analysis-grid">
+          <div className="mini-panel">
+            <div className="mini-head">
+              <div>
+                <small>BTC / USD</small>
+                <strong>$67,824.19</strong>
+              </div>
+              <span className="chip-pill positive">+2.15%</span>
+            </div>
+            <svg viewBox="0 0 420 130" className="sparkline" aria-label="BTC price chart">
+              <path d={btcPath} className="line line-primary" />
+            </svg>
+          </div>
+
+          <div className="mini-panel">
+            <div className="mini-head">
+              <div>
+                <small>XAU / USD</small>
+                <strong>{goldData.price}</strong>
+              </div>
+              <span className={`chip-pill ${goldData.tone}`}>{goldData.change}</span>
+            </div>
+            <svg viewBox="0 0 420 130" className="sparkline" aria-label="Gold price chart">
+              <path d={goldPath} className="line line-gold" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid-3">
+        <div className="panel gas-panel">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">On-chain</span>
+              <h2>Ethereum gas</h2>
+            </div>
+          </div>
+
+          <div className="gas-list">
+            <div className="gas-box slow">
+              <span>Slow</span>
+              <strong>{gasData.slow}</strong>
+            </div>
+            <div className="gas-box standard">
+              <span>Standard</span>
+              <strong>{gasData.standard}</strong>
+            </div>
+            <div className="gas-box fast">
+              <span>Fast</span>
+              <strong>{gasData.fast}</strong>
+            </div>
+          </div>
+
+          <div className="base-fee">
+            <label>Base fee</label>
+            <strong>{gasData.baseFee}</strong>
           </div>
         </div>
 
@@ -420,52 +582,33 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
 
-      <section className="panel full-panel">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow small">On-chain overview</span>
-            <h2>Blockchain market data</h2>
-          </div>
-        </div>
-
-        <div className="coin-grid">
-          {blockchainAssets.map((coin) => (
-            <div key={coin.symbol} className="coin-card">
-              <div className="coin-top">
-                <div className="coin-name-wrap">
-                  <span className="coin-badge">{coin.symbol.slice(0, 2)}</span>
-                  <div>
-                    <strong>{coin.symbol}</strong>
-                    <small>{coin.name}</small>
-                  </div>
-                </div>
-                <span className={`coin-change ${coin.tone}`}>{coin.change}</span>
-              </div>
-
-              <div className="coin-price">{coin.price}</div>
-
-              <div className="coin-meta">
-                <span>
-                  <label>Market cap</label>
-                  <strong>{coin.marketCap}</strong>
-                </span>
-                <span>
-                  <label>Volume</label>
-                  <strong>{coin.volume}</strong>
-                </span>
-                <span>
-                  <label>Network</label>
-                  <strong>{coin.network}</strong>
-                </span>
-              </div>
+        <div className="panel" id="insights">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow small">Signal</span>
+              <h2>Market insight</h2>
             </div>
-          ))}
+          </div>
+
+          <ul className="feature-list">
+            <li>
+              <strong>Momentum</strong>
+              <span>Risk appetite remains healthy as crypto majors continue to trade above major moving averages.</span>
+            </li>
+            <li>
+              <strong>FX rotation</strong>
+              <span>USD strength is still dominant during North American hours while EUR and GBP hold range support.</span>
+            </li>
+            <li>
+              <strong>Gas pressure</strong>
+              <span>Layer-1 throughput remains stable while fee volatility remains within acceptable execution ranges.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
-      <section className="bottom-grid" id="insights">
+      <section className="bottom-grid">
         <div className="panel transactions-panel">
           <div className="section-head">
             <div>
@@ -504,7 +647,7 @@ export default function Home() {
           <ul className="feature-list">
             <li>
               <strong>Unified monitoring</strong>
-              <span>Track multi-chain metrics, FX pricing, and session flow from a single control surface.</span>
+              <span>Track multi-chain metrics, FX pricing, and session flow from a single live control surface.</span>
             </li>
             <li>
               <strong>Real-time visibility</strong>
