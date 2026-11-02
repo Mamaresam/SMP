@@ -1,6 +1,28 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-const DEFAULT_FOREX = [
+import { useEffect, useState } from 'react';
+
+type ForexRow = {
+  pair: string;
+  price: string;
+  change: string;
+  tone: 'positive' | 'negative';
+  spread: string;
+  session: string;
+};
+
+type CryptoRow = {
+  symbol: string;
+  name: string;
+  price: string;
+  change: string;
+  marketCap: string;
+  volume: string;
+  network: string;
+  tone: 'positive' | 'negative';
+};
+
+const DEFAULT_FOREX: ForexRow[] = [
   { pair: 'EUR/USD', price: '1.0847', change: '+0.18%', tone: 'positive', spread: '0.0002', session: 'London / New York' },
   { pair: 'GBP/USD', price: '1.2674', change: '+0.31%', tone: 'positive', spread: '0.0003', session: 'London / NY' },
   { pair: 'USD/JPY', price: '154.82', change: '-0.22%', tone: 'negative', spread: '0.04', session: 'Tokyo / London' },
@@ -9,20 +31,13 @@ const DEFAULT_FOREX = [
   { pair: 'NZD/USD', price: '0.6132', change: '+0.09%', tone: 'positive', spread: '0.0004', session: 'Sydney / Tokyo' },
 ];
 
-const DEFAULT_CRYPTO = [
+const DEFAULT_CRYPTO: CryptoRow[] = [
   { symbol: 'BTC', name: 'Bitcoin', price: '$67,824.19', change: '+2.15%', marketCap: '$1.33T', volume: '$32.7B', network: 'PoW', tone: 'positive' },
   { symbol: 'ETH', name: 'Ethereum', price: '$3,420.27', change: '+4.82%', marketCap: '$410.8B', volume: '$18.4B', network: 'PoS', tone: 'positive' },
   { symbol: 'SOL', name: 'Solana', price: '$158.22', change: '+7.63%', marketCap: '$72.1B', volume: '$4.8B', network: 'PoS', tone: 'positive' },
   { symbol: 'BNB', name: 'BNB Chain', price: '$593.48', change: '+1.48%', marketCap: '$86.3B', volume: '$1.9B', network: 'PoSA', tone: 'positive' },
   { symbol: 'AVAX', name: 'Avalanche', price: '$35.81', change: '-1.14%', marketCap: '$14.2B', volume: '$621.4M', network: 'PoS', tone: 'negative' },
   { symbol: 'MATIC', name: 'Polygon', price: '$0.97', change: '+1.42%', marketCap: '$9.3B', volume: '$214.8M', network: 'PoS', tone: 'positive' },
-];
-
-const tradingSessions = [
-  { name: 'Sydney', open: '22:00', close: '07:00', status: 'Open', timezone: 'UTC+10', overlap: 'Tokyo', color: 'blue' },
-  { name: 'Tokyo', open: '00:00', close: '09:00', status: 'Open', timezone: 'UTC+9', overlap: 'London', color: 'purple' },
-  { name: 'London', open: '08:00', close: '17:00', status: 'Open', timezone: 'UTC+1', overlap: 'New York', color: 'green' },
-  { name: 'New York', open: '13:00', close: '22:00', status: 'Open', timezone: 'UTC-5', overlap: 'London', color: 'amber' },
 ];
 
 const stats = [
@@ -46,6 +61,13 @@ const marketData = [
   { asset: 'MATIC', price: '$0.97', change: '+1.42%', volume: '$214.8M', sentiment: 'neutral' },
 ];
 
+const tradingSessions = [
+  { name: 'Sydney', open: '22:00', close: '07:00', status: 'Open', timezone: 'UTC+10', overlap: 'Tokyo', color: 'blue' },
+  { name: 'Tokyo', open: '00:00', close: '09:00', status: 'Open', timezone: 'UTC+9', overlap: 'London', color: 'purple' },
+  { name: 'London', open: '08:00', close: '17:00', status: 'Open', timezone: 'UTC+1', overlap: 'New York', color: 'green' },
+  { name: 'New York', open: '13:00', close: '22:00', status: 'Open', timezone: 'UTC-5', overlap: 'London', color: 'amber' },
+];
+
 const transactions = [
   { hash: '0x5d2c...f14a', time: '2 min ago', amount: '2.88 ETH', status: 'Success' },
   { hash: '0x17a1...0a44', time: '7 min ago', amount: '410 USDT', status: 'Success' },
@@ -63,16 +85,16 @@ function formatMoney(value: number): string {
   return `$${value.toFixed(2)}`;
 }
 
-async function fetchForexData() {
+async function fetchForexData(): Promise<ForexRow[]> {
   try {
     const response = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CHF,AUD,NZD', {
-      next: { revalidate: 300 },
+      headers: { Accept: 'application/json' },
       cache: 'no-store',
     });
 
     if (!response.ok) throw new Error('FX fetch failed');
 
-    const json = await response.json();
+    const json = await response.json() as { rates?: Record<string, number> };
     const rates = json.rates ?? {};
 
     const pairMap = [
@@ -86,22 +108,21 @@ async function fetchForexData() {
 
     return pairMap.map(({ pair, base }) => {
       const rate = rates[base] ?? 1;
-      const numericValue = pair.startsWith('USD/') ? rate : 1 / rate;
-      const roughSpread = pair.includes('/') && pair.startsWith('USD/') ? 0.04 : 0.0003;
-
-      const positive = pair === 'USD/JPY' ? rate < 154.9 : numericValue > (pair === 'EUR/USD' ? 1.08 : 0.6);
+      const numericValue = pair.startsWith('USD/') ? 1 / rate : 1 / rate;
+      const positive = pair === 'USD/JPY' ? rate < 154.9 : numericValue > 1;
 
       return {
         pair,
         price: numericValue.toFixed(pair.startsWith('USD/') ? 2 : 4),
         change: positive ? '+0.18%' : '-0.12%',
         tone: positive ? 'positive' : 'negative',
-        spread: pair.startsWith('USD/') ? roughSpread.toFixed(pair === 'USD/JPY' ? 2 : 4) : roughSpread.toFixed(4),
-        session: pair === 'EUR/USD' || pair === 'GBP/USD' || pair === 'USD/CHF'
-          ? 'London / New York'
-          : pair === 'USD/JPY'
-            ? 'Tokyo / London'
-            : 'Sydney / Tokyo',
+        spread: pair.startsWith('USD/') ? (pair === 'USD/JPY' ? '0.04' : '0.0003') : '0.0003',
+        session:
+          pair === 'EUR/USD' || pair === 'GBP/USD' || pair === 'USD/CHF'
+            ? 'London / New York'
+            : pair === 'USD/JPY'
+              ? 'Tokyo / London'
+              : 'Sydney / Tokyo',
       };
     });
   } catch {
@@ -109,19 +130,27 @@ async function fetchForexData() {
   }
 }
 
-async function fetchCryptoData() {
+async function fetchCryptoData(): Promise<CryptoRow[]> {
   try {
     const ids = ['bitcoin', 'ethereum', 'solana', 'binancecoin', 'avalanche-2', 'matic-network'];
     const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids.join(',')}&price_change_percentage=24h&sparkline=false&precision=2&locale=en`;
 
     const response = await fetch(url, {
-      next: { revalidate: 300 },
+      headers: { Accept: 'application/json' },
       cache: 'no-store',
     });
 
     if (!response.ok) throw new Error('Crypto fetch failed');
 
-    const data = await response.json();
+    const data = await response.json() as Array<{
+      id: string;
+      name: string;
+      symbol: string;
+      current_price: number;
+      market_cap: number;
+      total_volume: number;
+      price_change_percentage_24h: number;
+    }>;
 
     const networkMap: Record<string, string> = {
       bitcoin: 'PoW',
@@ -141,11 +170,11 @@ async function fetchCryptoData() {
       'matic-network': 'MATIC',
     };
 
-    return (data ?? []).map((coin: any) => ({
+    return (data ?? []).map((coin) => ({
       symbol: symbolMap[coin.id] ?? coin.symbol.toUpperCase(),
       name: coin.name,
       price: `$${Number(coin.current_price ?? 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`,
-      change: `${coin.price_change_percentage_24h >= 0 ? '+' : ''}${Number(coin.price_change_percentage_24h ?? 0).toFixed(2)}%`,
+      change: `${Number(coin.price_change_percentage_24h ?? 0) >= 0 ? '+' : ''}${Number(coin.price_change_percentage_24h ?? 0).toFixed(2)}%`,
       marketCap: formatMoney(Number(coin.market_cap ?? 0)),
       volume: formatMoney(Number(coin.total_volume ?? 0)),
       network: networkMap[coin.id] ?? 'PoS',
@@ -156,11 +185,37 @@ async function fetchCryptoData() {
   }
 }
 
-export default async function Home() {
-  const [forexPairs, blockchainAssets] = await Promise.all([
-    fetchForexData(),
-    fetchCryptoData(),
-  ]);
+export default function Home() {
+  const [forexPairs, setForexPairs] = useState<ForexRow[]>(DEFAULT_FOREX);
+  const [blockchainAssets, setBlockchainAssets] = useState<CryptoRow[]>(DEFAULT_CRYPTO);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadData = async () => {
+      try {
+        const [fx, crypto] = await Promise.all([fetchForexData(), fetchCryptoData()]);
+
+        if (isMounted) {
+          setForexPairs(fx);
+          setBlockchainAssets(crypto);
+        }
+      } catch {
+        // leave fallback values in place
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <main className="page-shell">
@@ -217,7 +272,7 @@ export default async function Home() {
         <div className="hero-panel">
           <div className="panel-header">
             <div>
-              <span className="chip live">Live</span>
+              <span className="chip live">{isLoading ? 'Syncing' : 'Live'}</span>
               <h3>Network Overview</h3>
             </div>
             <span className="status-pill">+3.42% today</span>
